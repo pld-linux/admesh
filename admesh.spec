@@ -1,12 +1,14 @@
 Summary:	Diagnose and/or repair problems with STereo Lithography files
+Summary(pl.UTF-8):	Diagnostyka i/lub naprawa plików STL (służących do stereolitografii)
 Name:		admesh
-Version:	0.98.2
+Version:	0.98.5
 Release:	1
 License:	GPL v2+
 Group:		Applications/Engineering
-URL:		http://github.com/admesh/admesh/
-Source0:	http://github.com/admesh/admesh/releases/download/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	a90692eb6dc5289e95949bbbca3e37e9
+#Source0Download: https://github.com/admesh/admesh/releases
+Source0:	https://github.com/admesh/admesh/releases/download/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	36d6b13ee568f27501584b1259d6fe01
+URL:		https://github.com/admesh/admesh/
 Requires:	%{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
@@ -19,8 +21,30 @@ supported. ADMesh can read both ASCII and binary format STL files,
 while the output can be in AutoCAD DXF, Geomview OFF, STL, or VRML
 format.
 
+%description -l pl.UTF-8
+ADMesh to program do diagnostyki i/lub naprawy najczęściej
+występujących problemów w plikach STL (STereo Lithography), służących
+do stereolitografii. Potrafi usuwać zdegenerowane i niepołączone
+ściany, łączyć bliskie ściany, wypełniać dziury przez dodanie ścian
+oraz naprawiać normalne ścian. Obsługiwane są także proste
+przekształcenia, takie jak skalowanie, przesunięcia i obroty. ADMesh
+potrafi czytać pliki STL w formacii ASCII, jak i binarym, zaś wyjście
+może być w formacie AutoCAD DXF, Geomview OFF, STL lub VRML.
+
+%package libs
+Summary:	Runtime library for the ADMesh application
+Summary(pl.UTF-8):	Biblioteka uruchomieniowa aplikacji ADMesh
+Group:		Libraries
+
+%description libs
+This package contains the ADMesh runtime library.
+
+%description libs -l pl.UTF-8
+Ten pakiet zawiera bibliotekę uruchomieniową ADMesh.
+
 %package devel
-Summary:	Development files for the %{name} library
+Summary:	Development files for the ADMesh library
+Summary(pl.UTF-8):	Pliki programistyczne biblioteki ADMesh
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -29,14 +53,15 @@ ADMesh is a program for diagnosing and/or repairing commonly
 encountered problems with STL (STereo Lithography) data files.
 
 This package contains the development files needed for building new
-applications that utilize the %{name} library.
+applications that utilize the ADMesh library.
 
-%package libs
-Summary:	Runtime library for the %{name} application
-Group:		Development/Libraries
+%description devel -l pl.UTF-8
+ADMesh to program do diagnostyki i/lub naprawy najczęściej
+występujących problemów w plikach STL (STereo Lithography), służących
+do stereolitografii.
 
-%description libs
-This package contains the %{name} runtime library.
+Ten pakiet zawiera pliki programistyczne, potrzebe do budowania nowych
+aplikacji wykorzystujących bibliotekę ADMesh.
 
 %prep
 %setup -q
@@ -52,29 +77,28 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib%{name}.la
-
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libadmesh.la
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
-%doc ChangeLog ChangeLog.old README.md AUTHORS
-%doc %{name}-doc.txt block.stl
-%attr(755,root,root) %{_bindir}/%{name}
+%doc AUTHORS ChangeLog ChangeLog.old README.md admesh-doc.txt block.stl
+%attr(755,root,root) %{_bindir}/admesh
 %{_mandir}/man1/admesh.1*
-
-%files devel
-%defattr(644,root,root,755)
-%{_includedir}/admesh
-%{_pkgconfigdir}/libadmesh.pc
-%attr(755,root,root) %{_libdir}/lib%{name}.so
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %ghost %{_libdir}/lib%{name}.so.1
-%attr(755,root,root) %{_libdir}/lib%{name}.so.*.*
+%attr(755,root,root) %{_libdir}/libadmesh.so.*.*.*
+%ghost %{_libdir}/libadmesh.so.1
+
+%files devel
+%defattr(644,root,root,755)
+%{_libdir}/libadmesh.so
+%{_includedir}/admesh
+%{_pkgconfigdir}/libadmesh.pc
